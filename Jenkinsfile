@@ -1,32 +1,29 @@
- pipline {
+pipeline {
    agent { label 'Jenkins-Agent' }
    tools {
-     jdk 'Java17'
-     maven 'Maven3'
+       jdk 'Java17'
+       maven 'Maven3'
    }
    stages {
-     stage ("Cleanup Workspace"){
-       steps {
-         cleasWs()
+       stage("Cleanup Workspace") {
+           steps {
+               cleanWs() // Correction : "cleanWs" et non "cleasWs".
+           }
        }
-     }
-     stage("Checkout from SCM"){
-       steps{
-         git branch: 'main' , credentialsId: 'github' , url : 'https://github.com/Lahcen-aglagal/registration-app.git'
+       stage("Checkout from SCM") {
+           steps {
+               git branch: 'main', credentialsId: 'github', url: 'https://github.com/Lahcen-aglagal/registration-app.git'
+           }
        }
-     }
-     stage("Build Applicaiton"){
-       steps{
-         sh "mvn clean package"
+       stage("Build Application") {
+           steps {
+               sh "mvn clean package"
+           }
        }
-     }
-
-     stage("test Application"){
-       steps {
-         sh "mvn test"
+       stage("Test Application") {
+           steps {
+               sh "mvn test"
+           }
        }
-     }
-
-     
    }
- }
+}

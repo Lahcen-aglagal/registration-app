@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     // Construire l'image Docker
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_PASS) {
+                    docker.withRegistry('', DOCKER_PASS) {
                         def docker_image = docker.build("${IMAGE_NAME}:${RELEASE}-${env.BUILD_NUMBER}")
                         
                         // Pousser les images Docker

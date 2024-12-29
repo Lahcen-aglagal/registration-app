@@ -32,19 +32,35 @@ pipeline {
                 sh "mvn test"
             }
         }
-        stage("Build and Push Docker Image") {
+        stage("Verify WAR file") {
             steps {
                 script {
-                    // Construire l'image Docker
-                    docker.withRegistry('', DOCKER_PASS) {
-                        def docker_image = docker.build("${IMAGE_NAME}:${RELEASE}-${env.BUILD_NUMBER}")
-                        
-                        // Pousser les images Docker
-                        docker_image.push("${RELEASE}-${env.BUILD_NUMBER}")
-                        docker_image.push("latest")
+                    def warFile = "target/*.war"
+                    if (!fileExists(warFile)) {
+                        error("WAR file not found! Check Maven build logs.")
                     }
                 }
             }
         }
+    stage("Build and Push Docker Image") {
+        steps {
+            script {
+                // Vérification du fichier WAR
+                if (!fileExists("target/*.war")) {
+                    error("WAR file not found! Check Maven build logs.")
+                }
+    
+                // Construire l'image Docker
+                docker.withRegistry('https://index.docker.io/v1/', DOCKER_PASS) {
+                    def docker_image = docker.build("${IMAGE_NAME}:${RELEASE}-${env.BUILD_NUMBER}")
+                    
+                    // Pousser les images Docker
+                    docker_image.push("${RELEASE}-${env.BUILD_NUMBER}")
+                    docker_image.push("latest")
+                }
+            }
+        }
+    }
+
     }
 }
